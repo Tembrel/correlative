@@ -1,0 +1,79 @@
+<project name="correlative" default="run" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <description>
+        Responding to some MH ideas.
+    </description>
+
+    <property name="main.class.name" value="net.peierls.example.correlation.Correlation"/>
+    
+    <property name="build.dir" location="${basedir}/build"/>
+    <property name="classes.dir" location="${build.dir}/classes"/>
+    <property name="lib.dir" location="${basedir}/lib"/>
+    <property name="src.dir" location="${basedir}/src/main/java"/>
+    
+    <path id="compile.classpath">
+        <fileset dir="${lib.dir}" includes="*.jar" />
+    </path>
+ 
+    <path id="runtime.classpath">
+        <path refid="compile.classpath" />
+        <path location="${classes.dir}" />
+    </path>   
+   
+    <target name="resolve">
+
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+                 uri="antlib:org.apache.ivy.ant" 
+                 classpath="${user.home}/.ivy2/jars/ivy-2.4.0.jar" />
+
+        <ivy:retrieve pattern="${lib.dir}/[artifact].[ext]" 
+                      type="jar, bundle" 
+                      sync="true" />
+
+    </target>
+    
+    
+    <target name="compile"
+            description="Compile the Java sources" >
+            
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${lib.dir}"/>
+        
+        <javac srcdir="${src.dir}" 
+               destdir="${classes.dir}" 
+               classpathref="compile.classpath"
+               includeAntRuntime="false" >
+               
+            <compilerarg value="-Xlint:deprecation"/>
+            <compilerarg value="-Xlint:unchecked"/>
+            
+            <exclude name="**/package-info.java" />
+            
+        </javac>
+
+    </target>
+    
+    
+    <target name="run" depends="compile"
+            description="Compile and run the project" >
+
+        <java classpathref="runtime.classpath" 
+              classname="${main.class.name}"
+              fork="true" >
+              
+            <assertions>
+                <enable />
+            </assertions>
+            
+        </java>
+
+    </target>
+    
+    
+    <target name="clean"
+            description="Clean up build files" >
+            
+        <delete dir="${build.dir}"/>
+        
+    </target>
+    
+</project>
